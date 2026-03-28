@@ -1,0 +1,16 @@
+services:
+  db:
+    image: postgres:15
+    container_name: sentinel-db
+    environment:
+      POSTGRES_DB: sentinel
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - sentinel-db-data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  sentinel-db-data:
