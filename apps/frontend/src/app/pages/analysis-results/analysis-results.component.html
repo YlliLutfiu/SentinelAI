@@ -1,0 +1,172 @@
+<div class="min-h-[80vh]">
+  <!-- Page Content -->
+  <div class="max-w-7xl mx-auto px-6 py-12">
+    <!-- Go Back Button -->
+    <button (click)="goBack()" 
+            class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-slate-500 to-gray-600 hover:from-slate-600 hover:to-gray-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 mb-8">
+      <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+      </svg>
+      Go Back
+    </button>
+    
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="text-center py-24">
+      <div class="inline-block animate-spin rounded-full h-24 w-24 border-4 border-blue-200 border-t-blue-600 mb-8 shadow-xl"></div>
+      <h2 class="text-4xl font-black text-gray-800 mb-4">Analyzing Security</h2>
+      <p class="text-xl text-gray-600 mb-8">Advanced threat detection in progress...</p>
+      <div class="space-y-2 text-sm text-gray-500">
+        <p>• Scanning for phishing patterns</p>
+        <p>• Checking malware indicators</p>
+        <p>• Analyzing credential risks</p>
+      </div>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="errorMessage" class="max-w-2xl mx-auto bg-gradient-to-r from-red-50 to-orange-50 border border-red-200 rounded-3xl p-12 shadow-2xl">
+      <div class="text-center mb-8">
+        <div class="w-24 h-24 mx-auto bg-red-100 rounded-full flex items-center justify-center mb-6">
+          <svg class="w-12 h-12 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+          </svg>
+        </div>
+        <h2 class="text-3xl font-black text-gray-900 mb-4">Analysis Interrupted</h2>
+        <p class="text-xl text-gray-600">{{ errorMessage }}</p>
+      </div>
+      <div class="flex gap-4 justify-center">
+        <button (click)="router.navigate(['/analysis'])" class="px-8 py-4 bg-gradient-to-r from-emerald-500 to-green-600 text-white font-bold rounded-2xl shadow-xl hover:shadow-2xl hover:from-emerald-600 hover:to-green-700 transform hover:-translate-y-1 transition-all">
+          Try New Analysis
+        </button>
+        <button (click)="onLogout()" class="px-8 py-4 bg-gradient-to-r from-slate-500 to-gray-600 text-white font-bold rounded-2xl shadow-xl hover:shadow-2xl hover:from-slate-600 hover:to-gray-700 transform hover:-translate-y-1 transition-all">
+          Logout
+        </button>
+      </div>
+    </div>
+
+    <!-- Success Results -->
+    <div *ngIf="result" class="space-y-8">
+      
+      <!-- Hero Risk Cards -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div class="group relative overflow-hidden rounded-3xl shadow-2xl p-10 bg-gradient-to-br" [ngClass]="getRiskGradientClass()">
+          <div class="absolute inset-0 bg-black/10 backdrop-blur-sm"></div>
+          <div class="relative z-10">
+            <h2 class="text-2xl font-black text-white/90 mb-6 uppercase tracking-wide">Risk Score</h2>
+            <div class="flex items-baseline">
+              <span class="text-6xl font-black text-white drop-shadow-lg">{{ result.riskScore }}</span>
+              <span class="text-2xl font-bold text-white/80 ml-4">/100</span>
+            </div>
+            <div class="w-full bg-white/20 rounded-full h-3 mt-6">
+              <div class="bg-white h-3 rounded-full" [style.width.%]="result.riskScore"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="group relative overflow-hidden rounded-3xl shadow-2xl p-10 bg-gradient-to-br" [ngClass]="getRiskGradientClass()">
+          <div class="absolute inset-0 bg-black/10 backdrop-blur-sm"></div>
+          <div class="relative z-10">
+            <h2 class="text-2xl font-black text-white/90 mb-6 uppercase tracking-wide">Threat Level</h2>
+            <p class="text-5xl font-black text-white drop-shadow-2xl mb-4">{{ result.riskLevel | uppercase }}</p>
+            <p class="text-xl text-white/90 font-semibold">{{ getRiskDescription() }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Correlation ID -->
+      <div class="bg-gradient-to-r from-slate-50 to-gray-100 rounded-3xl p-8 shadow-xl backdrop-blur-sm">
+        <h3 class="text-2xl font-black text-gray-900 mb-6 flex items-center">
+          <svg class="w-8 h-8 text-blue-600 mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+          </svg>
+          Analysis ID
+        </h3>
+        <div class="bg-white/60 p-6 rounded-2xl shadow-lg backdrop-blur-sm">
+          <code class="text-lg font-mono break-all text-gray-900 tracking-wide">{{ result.correlationId }}</code>
+        </div>
+      </div>
+
+      <!-- Threat Signals -->
+      <div class="bg-white/70 backdrop-blur-sm rounded-3xl shadow-2xl p-10 border border-gray-200">
+        <h3 class="text-3xl font-black text-gray-900 mb-8 flex items-center">
+          <svg class="w-10 h-10 text-yellow-600 mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+          </svg>
+          Detected Threats ({{ result.signals.length }})
+        </h3>
+        <div class="grid md:grid-cols-2 gap-6">
+          <div *ngFor="let signal of result.signals; let i = index; trackBy: trackByFn" class="group p-8 rounded-2xl bg-gradient-to-r from-yellow-50 to-orange-50 border-2 border-yellow-200 hover:border-yellow-300 hover:shadow-xl transition-all duration-300 cursor-pointer">
+            <div class="flex items-start">
+              <div class="flex-shrink-0 w-16 h-16 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-2xl flex items-center justify-center mr-6 shadow-lg group-hover:scale-110 transition-transform">
+                <span class="text-2xl font-black text-white">{{ i + 1 }}</span>
+              </div>
+              <div class="flex-1">
+                <h4 class="text-xl font-bold text-gray-900 mb-3">{{ signal.type | titlecase }}</h4>
+                <p class="text-gray-700 text-lg mb-4 leading-relaxed">{{ signal.description }}</p>
+                <div class="flex items-center">
+                  <span class="inline-flex items-center px-4 py-2 rounded-full text-lg font-bold bg-gradient-to-r from-yellow-400 to-orange-400 text-white shadow-lg mr-6">
+                    {{ signal.confidence }}% Confidence
+                  </span>
+                  <div class="flex-1 bg-gray-200 rounded-full h-4">
+                    <div class="bg-gradient-to-r from-yellow-500 to-orange-500 h-4 rounded-full shadow-inner" [style.width.%]="signal.confidence"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div *ngIf="result.signals.length === 0" class="text-center py-20">
+          <div class="w-32 h-32 mx-auto bg-gradient-to-r from-green-400 to-emerald-500 rounded-full flex items-center justify-center mb-8 shadow-2xl">
+            <svg class="w-20 h-20 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+          <h3 class="text-4xl font-black text-green-800 mb-4">Clean Content</h3>
+          <p class="text-2xl text-gray-600">No security threats detected 🎉</p>
+        </div>
+      </div>
+
+      <!-- Recommendations -->
+      <div class="bg-white/70 backdrop-blur-sm rounded-3xl shadow-2xl p-10 border border-gray-200">
+        <h3 class="text-3xl font-black text-gray-900 mb-8 flex items-center">
+          <svg class="w-10 h-10 text-emerald-600 mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          Security Recommendations
+        </h3>
+        <div class="grid gap-6">
+          <div *ngFor="let rec of result.recommendations; let i = index" class="group p-8 rounded-2xl bg-gradient-to-br from-emerald-50 to-green-50 border-2 border-emerald-200 hover:border-emerald-400 hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 cursor-pointer">
+            <div class="flex items-start">
+              <div class="flex-shrink-0 w-14 h-14 bg-gradient-to-r from-emerald-500 to-green-600 rounded-2xl flex items-center justify-center mr-6 mt-0.5 shadow-xl group-hover:scale-110 transition-transform">
+                <span class="text-2xl font-black text-white">{{ i + 1 }}</span>
+              </div>
+              <div class="flex-1">
+                <p class="text-xl font-bold text-gray-900 mb-4 leading-tight">{{ rec }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="grid md:grid-cols-2 gap-8 p-10 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-3xl shadow-2xl border border-blue-200">
+        <button (click)="downloadJSON()" class="group relative p-8 rounded-3xl bg-gradient-to-r from-indigo-600 to-blue-700 text-white font-black text-xl shadow-2xl hover:shadow-3xl hover:-translate-y-2 transition-all duration-500 overflow-hidden">
+          <div class="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+          <svg class="w-12 h-12 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10l-5.5 5.5m0 0L7.5 19.5m-2.5-2.5l5.5-5.5"></path>
+          </svg>
+          <p class="font-bold text-lg mb-2">Download Report</p>
+          <p class="opacity-90">JSON Format</p>
+        </button>
+        <button (click)="showPDFReport()" class="group relative p-8 rounded-3xl bg-gradient-to-r from-green-600 to-emerald-700 text-white font-black text-xl shadow-2xl hover:shadow-3xl hover:-translate-y-2 transition-all duration-500 overflow-hidden">
+          <div class="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+          <svg class="w-12 h-12 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+          </svg>
+          <p class="font-bold text-lg mb-2">View Report</p>
+          <p class="opacity-90">PDF Preview</p>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
