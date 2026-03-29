@@ -3,3 +3,14 @@ node_modules
 .env
 
 /generated/prisma
+
+# Build outputs
+dist/
+build/
+
+# Prisma migrations (if local only)
+prisma/migrations/0_init/
+
+# Logs
+logs
+*.log
